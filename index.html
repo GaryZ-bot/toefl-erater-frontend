@@ -18,12 +18,14 @@
     .card { border: 1px solid #2b2f55; border-radius: 12px; padding: 1rem; margin-top: 1rem; background:#0f1430; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem 1rem; }
   </style>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
   <div class="wrap">
   <h1>TOEFL E-rater</h1>
   <p class="muted">Paste your essay and get a 1–5 score with quick feedback.</p>
   <textarea id="essay" placeholder="Paste your essay here..."></textarea>
+  <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE"></div>
   <div>
     <button id="scoreBtn">Get score</button>
     <span id="status" class="muted"></span>
@@ -42,10 +44,12 @@
 
       try {
         const API_BASE = 'https://erater-project.fly.dev';
+        // Get Turnstile token from the widget
+        const token = document.querySelector('textarea[name="cf-turnstile-response"]')?.value || '';
         const res = await fetch(`${API_BASE}/api/grade`, {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ essay })
+          body: JSON.stringify({ essay, turnstile_token: token })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
